@@ -58,6 +58,7 @@ OBJDUMP := objdump
 # Try to infer the correct QEMU if not specified
 ifndef QEMU
 QEMU :=qemu-system-i386
+endif
 
 # try to generate a unique GDB port
 GDBPORT := $(shell expr `id -u` % 5000 + 25000)
