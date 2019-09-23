@@ -1,18 +1,40 @@
 *.vscode
 
-*~
-_*
+
+# Compiled Object files
 *.o
+
+# Compiled Static libraries
+*.a
+
+# dependancy files
 *.d
+
+# generated assembly
 *.asm
+
+# generated symbols
 *.sym
-*.img
-vectors.S
-bootblock
-entryother
+
+# disk images
+fs.img
+xv6.img
+xv6memfs.img
+
+# other generated files
+bootother
 initcode
-initcode.out
-kernel
-kernelmemfs
-mkfs
+TAGS
 .gdbinit
+fs/
+kernel/vectors.S
+kernel/bootblock
+kernel/bootblock.out
+kernel/bootother.out
+kernel/initcode.out
+kernel/kernel
+bootother
+initcode
+user/bin/
+tools/mkfs
+version
