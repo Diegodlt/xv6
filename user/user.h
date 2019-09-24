@@ -22,10 +22,10 @@ int mkdir(char*);
 int chdir(char*);
 int dup(int);
 int getpid(void);
-int getpidcount(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+int getpidcount(void); // Custom system call
 
 // user library functions (ulib.c)
 int stat(char*, struct stat*);

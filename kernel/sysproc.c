@@ -40,6 +40,7 @@ sys_kill(void)
 int
 sys_getpid(void)
 {
+  // Increment global variable
   pidcount++;
   return proc->pid;
 }
