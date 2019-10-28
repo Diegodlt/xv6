@@ -23,7 +23,9 @@ int sys_unlink(void);
 int sys_wait(void);
 int sys_write(void);
 int sys_uptime(void);
-int sys_getpidcount(void); // Add custom system call
-int sys_getticketcount(void); // Custom system call
+/* Cusom system calls */
+int sys_getpidcount(void);
+int sys_getticketcount(void);
+int sys_settickets(void);
 
 #endif // _SYSFUNC_H_

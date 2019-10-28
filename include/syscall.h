@@ -23,8 +23,10 @@
 #define SYS_sbrk   19
 #define SYS_sleep  20
 #define SYS_uptime 21
-#define SYS_getpidcount 22 // Custom system call
-#define SYS_getticketcount 23 // Custom system call
+/* Custom system calls */
+#define SYS_getpidcount 22 
+#define SYS_getticketcount 23 
+#define SYS_settickets 24
 
 
 #endif // _SYSCALL_H_

@@ -104,3 +104,15 @@ int
 sys_getticketcount(){
   return proc->numTickets;
 }
+
+int
+sys_settickets(){
+
+  int ticketCount; // Number of tickets that will be set to a process
+  if(argint(0, &ticketCount) < 0)
+    return -1;
+
+  proc->numTickets = ticketCount;
+  
+  return proc->numTickets;
+}

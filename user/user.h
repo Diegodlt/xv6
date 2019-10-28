@@ -25,8 +25,10 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
-int getpidcount(void); // Custom system call
-int getticketcount(void); // Custom system call
+/* Cusom system calls */
+int getpidcount(void);
+int getticketcount(void);
+int settickets(int);
 
 // user library functions (ulib.c)
 int stat(char*, struct stat*);

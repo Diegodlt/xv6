@@ -444,4 +444,10 @@ procdump(void)
   }
 }
 
+int settickets(int tickets)
+{
+  proc->numTickets = tickets;
+  return proc->numTickets;
+}
+
 
