@@ -98,3 +98,9 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+// Custom system call to return the number of tickets of a process
+int
+sys_getticketcount(){
+  return proc->numTickets;
+}

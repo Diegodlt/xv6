@@ -24,6 +24,7 @@
 #define SYS_sleep  20
 #define SYS_uptime 21
 #define SYS_getpidcount 22 // Custom system call
+#define SYS_getticketcount 23 // Custom system call
 
 
 #endif // _SYSCALL_H_
