@@ -5,6 +5,7 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
+#include "pstat.h"
 
 struct {
   struct spinlock lock;
@@ -12,8 +13,11 @@ struct {
 } ptable;
 
 static struct proc *initproc;
+// static struct pstat *processTable;
 
 int nextpid = 1;
+int numberOfTickets = 0;
+
 extern void forkret(void);
 extern void trapret(void);
 
@@ -45,7 +49,9 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
-  p->numTickets = 1;
+  p->numTickets = 1; // assign tickets
+  numberOfTickets += p->numTickets; // set the total tickets
+
   release(&ptable.lock);
 
   // Allocate kernel stack if possible.
@@ -78,10 +84,21 @@ userinit(void)
 {
   struct proc *p;
   extern char _binary_initcode_start[], _binary_initcode_size[];
+
   
   p = allocproc();
   acquire(&ptable.lock);
   initproc = p;
+
+  // Fill pstat struct
+  // processTable->inuse[0] = 1;
+  // pstat->tickets[0] = p->numTickets;
+  // pstat->pid[0] = p->pid;
+  // pstat->ticks[0] = 0;
+
+  // Loop through pstat
+  // if insue = 0,
+  // fill pstat with then fill that slot, break loop
   if((p->pgdir = setupkvm()) == 0)
     panic("userinit: out of memory?");
   inituvm(p->pgdir, _binary_initcode_start, (int)_binary_initcode_size);
@@ -130,7 +147,7 @@ fork(void)
 {
   int i, pid;
   struct proc *np;
-
+  // struct pstat *pstat;
   // Allocate process.
   if((np = allocproc()) == 0)
     return -1;
@@ -146,6 +163,12 @@ fork(void)
   np->parent = proc;
   *np->tf = *proc->tf;
   np->numTickets = proc->numTickets;
+
+  for(int i = 0; i < NPROC; i++){
+    // if(!pstat->inuse[i]){
+
+    // }
+  }
 
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
@@ -447,6 +470,10 @@ procdump(void)
 
 int settickets(int tickets)
 {
+  // Add to the total amount of tickets
+  int ticketIncrement = tickets - proc->numTickets;
+  numberOfTickets += ticketIncrement;
+  // Set the tickets
   proc->numTickets = tickets;
   return proc->numTickets;
 }
