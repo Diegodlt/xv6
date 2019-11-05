@@ -27,6 +27,7 @@
 #define SYS_getpidcount 22 
 #define SYS_getticketcount 23 
 #define SYS_settickets 24
+#define SYS_getpinfo 25
 
 
 #endif // _SYSCALL_H_

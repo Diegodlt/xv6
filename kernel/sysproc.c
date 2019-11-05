@@ -5,6 +5,7 @@
 #include "mmu.h"
 #include "proc.h"
 #include "sysfunc.h"
+#include "pstat.h"
 
 int pidcount = 0;
 
@@ -111,8 +112,21 @@ sys_settickets(){
   int ticketCount; // Number of tickets that will be set to a process
   if(argint(0, &ticketCount) < 0)
     return -1;
-
-  proc->numTickets = ticketCount;
   
-  return proc->numTickets;
+  return settickets(ticketCount);
+}
+
+int
+sys_getpinfo(){
+  struct pstat *table;
+  if(argptr(0, (void *)&table, sizeof(*table)) < 0)
+  {
+    return -1;
+  }
+  if(table == NULL)
+  {
+    return -1;
+  }
+  getpinfo(table);
+  return 0;
 }

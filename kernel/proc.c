@@ -6,6 +6,7 @@
 #include "proc.h"
 #include "spinlock.h"
 #include "pstat.h"
+#include "rand.h"
 
 struct {
   struct spinlock lock;
@@ -13,7 +14,6 @@ struct {
 } ptable;
 
 static struct proc *initproc;
-// static struct pstat *processTable;
 
 int nextpid = 1;
 int numberOfTickets = 0;
@@ -50,8 +50,7 @@ found:
   p->state = EMBRYO;
   p->pid = nextpid++;
   p->numTickets = 1; // assign tickets
-  numberOfTickets += p->numTickets; // set the total tickets
-
+  p->numTicks = 0;
   release(&ptable.lock);
 
   // Allocate kernel stack if possible.
@@ -78,23 +77,23 @@ found:
   return p;
 }
 
+void test(struct pstat *table, struct proc *p){
+  table->inuse[0] = 1;
+  table->tickets[0] = p->numTickets;
+  table->pid[0] = p->pid;
+  table->ticks[0] = 0;
+}
+
 // Set up first user process.
 void
 userinit(void)
 {
   struct proc *p;
   extern char _binary_initcode_start[], _binary_initcode_size[];
-
   
   p = allocproc();
   acquire(&ptable.lock);
   initproc = p;
-
-  // Fill pstat struct
-  // processTable->inuse[0] = 1;
-  // pstat->tickets[0] = p->numTickets;
-  // pstat->pid[0] = p->pid;
-  // pstat->ticks[0] = 0;
 
   // Loop through pstat
   // if insue = 0,
@@ -163,12 +162,6 @@ fork(void)
   np->parent = proc;
   *np->tf = *proc->tf;
   np->numTickets = proc->numTickets;
-
-  for(int i = 0; i < NPROC; i++){
-    // if(!pstat->inuse[i]){
-
-    // }
-  }
 
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
@@ -283,21 +276,43 @@ scheduler(void)
   struct proc *p;
 
   for(;;){
+    int winner = 0;
+    int counter = 0;
+    int totalTickets = 0;
     // Enable interrupts on this processor.
     sti();
+    acquire(&ptable.lock);
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    {
+      if(p->state == RUNNABLE)
+        totalTickets += p->numTickets;
+    }
+        
+    if(totalTickets > 0)
+    {
+      winner = rand() % totalTickets + 1;
+    }
 
     // Loop over process table looking for process to run.
-    acquire(&ptable.lock);
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE)
         continue;
+      if(p->state == RUNNABLE && counter < winner) 
+      { 		
+        counter += p->numTickets;
+        if (counter >= winner)
+          goto run;
+        continue;
+      }
 
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
+      run:
       proc = p;
       switchuvm(p);
       p->state = RUNNING;
+      p->numTicks += 1;
       swtch(&cpu->scheduler, proc->context);
       switchkvm();
 
@@ -470,12 +485,36 @@ procdump(void)
 
 int settickets(int tickets)
 {
-  // Add to the total amount of tickets
-  int ticketIncrement = tickets - proc->numTickets;
-  numberOfTickets += ticketIncrement;
   // Set the tickets
   proc->numTickets = tickets;
   return proc->numTickets;
+}
+
+int getpinfo(struct pstat *table){
+  struct proc *p;
+	int i = 0;
+	acquire(&ptable.lock);
+	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+	{
+		if(p->state == ZOMBIE || p->state == EMBRYO)
+		{
+			continue;
+		}
+		if(p->state == UNUSED)
+		{
+			table->inuse[i] = 0;
+		}
+		else
+		{
+			table->inuse[i] = 1;
+		}
+		table->pid[i] = p->pid;
+		table->tickets[i] = p->numTickets;
+		table->ticks[i] = p->numTicks;
+		i++;
+	}
+	release(&ptable.lock);
+  return 1;
 }
 
 

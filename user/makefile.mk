@@ -6,6 +6,7 @@ USER_PROGS := \
 	forktest\
 	grep\
 	hello\
+	table\
 	init\
 	kill\
 	ln\

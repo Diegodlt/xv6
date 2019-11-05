@@ -2,6 +2,7 @@
 #define _USER_H_
 
 struct stat;
+struct pstat;
 
 // system calls
 int fork(void);
@@ -29,6 +30,7 @@ int uptime(void);
 int getpidcount(void);
 int getticketcount(void);
 int settickets(int);
+int getpinfo(struct pstat *table);
 
 // user library functions (ulib.c)
 int stat(char*, struct stat*);

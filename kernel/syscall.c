@@ -106,7 +106,8 @@ static int (*syscalls[])(void) = {
 /* Custom system calls */
 [SYS_getpidcount] sys_getpidcount, // Pointer to custom system call
 [SYS_getticketcount] sys_getticketcount,
-[SYS_settickets] sys_settickets
+[SYS_settickets] sys_settickets,
+[SYS_getpinfo]  sys_getpinfo
 };
 
 // Called on a syscall trap. Checks that the syscall number (passed via eax)
